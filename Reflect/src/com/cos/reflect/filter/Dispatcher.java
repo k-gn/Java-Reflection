@@ -10,6 +10,8 @@ import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import com.cos.reflect.controller.UserController;
+
 public class Dispatcher implements Filter {
 
 	@Override
@@ -24,6 +26,12 @@ public class Dispatcher implements Filter {
 		System.out.println("컨텍스트 패스 : " + req.getContextPath());
 		System.out.println("식별자 주소 : " + req.getRequestURI());
 		System.out.println("전체 주소 : " + req.getRequestURL());
+		
+		String endPoint = req.getRequestURI().replaceAll(req.getContextPath(), "");
+		System.out.println("endPoint : " + endPoint);
+		
+		UserController controller = new UserController();
+		
 		
 	}
 
