@@ -1,0 +1,2 @@
+2021-06-26 21:46:59,511 [Worker-5: Loading available Gradle versions] INFO  o.e.b.c.i.u.g.PublishedGradleVersions - Gradle version information cache is out-of-date. Trying to update.
+2021-06-26 21:51:18,644 [main] INFO  j.exodus.env.EnvironmentImpl - Exodus environment created: C:\myProject\JavaReflection\.metadata\com.genuitec.eclipse.webclipse.livepreview\0\store
