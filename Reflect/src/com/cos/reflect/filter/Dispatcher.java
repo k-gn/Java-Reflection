@@ -2,8 +2,9 @@ package com.cos.reflect.filter;
 
 import java.io.IOException;
 import java.lang.annotation.Annotation;
-import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.lang.reflect.Parameter;
+import java.util.Enumeration;
 
 import javax.servlet.Filter;
 import javax.servlet.FilterChain;
@@ -58,9 +59,23 @@ public class Dispatcher implements Filter {
 			
 			if(requestMapping.value().equals(endPoint)) {
 				try {
-					String path = (String) method.invoke(controller);
-					
-					RequestDispatcher rd = request.getRequestDispatcher(path); // 내부에서 해당 경로를 찾는다. 현재 '/' 경로니까 알아서 웰컴페이지(index.jsp) 를 찾는다.
+					Parameter[] params = method.getParameters();
+					String path = "";
+					if(params.length != 0) {
+						System.out.println("params[0] : " + params[0]);
+						System.out.println("params[0].getName() : " + params[0].getName());
+						System.out.println("params[0].getType() : " + params[0].getType());
+						Object dtoInstance = params[0].getType().newInstance(); // 파라미터 객체 생성
+//						String username = request.getParameter("username");
+//						String password = request.getParameter("password");
+//						System.out.println("username : " + username);
+//						System.out.println("password : " + password);
+						Enumeration<String> keys = request.getParameterNames(); // key 값들
+						
+					}else {
+						path = (String) method.invoke(controller);
+					}
+					RequestDispatcher rd = request.getRequestDispatcher(path); // 현재 '/' 경로니까 알아서 웰컴페이지(index.jsp) 를 찾는다. ( / = /index.jsp )
 					rd.forward(request, response);
 				} catch (Exception e) {
 					e.printStackTrace();
