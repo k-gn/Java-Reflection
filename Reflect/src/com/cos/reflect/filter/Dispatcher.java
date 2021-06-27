@@ -1,6 +1,7 @@
 package com.cos.reflect.filter;
 
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
@@ -51,27 +52,21 @@ public class Dispatcher implements Filter {
 //				}
 //			}
 //		}
-		
+		boolean isMatching = false;
 		for(Method method : methods) {
 			Annotation annotation = method.getDeclaredAnnotation(RequestMapping.class); // 해당 어노테이션을 찾는다.
 			RequestMapping requestMapping = (RequestMapping) annotation;
-			System.out.println(requestMapping.value());
 			
 			if(requestMapping.value().equals(endPoint)) {
+				isMatching = true;
 				try {
 					Parameter[] params = method.getParameters();
 					String path = "";
 					if(params.length != 0) {
-						System.out.println("params[0] : " + params[0]);
-						System.out.println("params[0].getName() : " + params[0].getName());
-						System.out.println("params[0].getType() : " + params[0].getType());
 						Object dtoInstance = params[0].getType().newInstance(); // 파라미터 객체 생성
-//						String username = request.getParameter("username");
-//						String password = request.getParameter("password");
-//						System.out.println("username : " + username);
-//						System.out.println("password : " + password);
-						Enumeration<String> keys = request.getParameterNames(); // key 값들
+						setDate(dtoInstance, req); // request로 들어온 파라미터 값을 해당 인스턴스에 넣어주는 작업
 						
+						path = (String) method.invoke(controller, dtoInstance);
 					}else {
 						path = (String) method.invoke(controller);
 					}
@@ -83,7 +78,41 @@ public class Dispatcher implements Filter {
 				break;
 			}
 		}
+		
+		if(!isMatching) {
+			response.setContentType("text/html; charset=utf-8");
+			PrintWriter out = response.getWriter();
+			out.println("잘못된 주소 요청입니다.");
+			out.flush();
+		}
 
+	}
+	
+	private <T> void setDate(T instance, HttpServletRequest request) {
+		Enumeration<String> keys = request.getParameterNames(); // key 값들 (파라미터의 이름 목록)
+		
+		while(keys.hasMoreElements()) {
+			String key = (String) keys.nextElement();
+			String methodKey = keyToMethodKey(key);
+			System.out.println("methodKey : " + methodKey);
+			Method[] methods = instance.getClass().getDeclaredMethods();
+			for(Method method : methods) {
+				if(method.getName().equals(methodKey)) { // 해당 set 메소드 찾기
+					try {
+						method.invoke(instance, request.getParameter(key)); // 실행할 객체와 인자를 전달
+					} catch (Exception e) {
+						e.printStackTrace();
+					} 
+				}
+			}
+		}
+	}
+	
+	private String keyToMethodKey(String key) {
+		String firstKey = "set";
+		String upperKey = key.substring(0, 1).toUpperCase();
+		String remainKey = key.substring(1);
+		return firstKey + upperKey + remainKey;
 	}
 
 }
