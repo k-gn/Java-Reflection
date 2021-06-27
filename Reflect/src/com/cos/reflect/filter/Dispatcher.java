@@ -30,9 +30,9 @@ public class Dispatcher implements Filter {
 		HttpServletRequest req = (HttpServletRequest) request;
 		HttpServletResponse resp = (HttpServletResponse) response;
 
-		System.out.println("컨텍스트 패스 : " + req.getContextPath());
-		System.out.println("식별자 주소 : " + req.getRequestURI());
-		System.out.println("전체 주소 : " + req.getRequestURL());
+//		System.out.println("컨텍스트 패스 : " + req.getContextPath());
+//		System.out.println("식별자 주소 : " + req.getRequestURI());
+//		System.out.println("전체 주소 : " + req.getRequestURL());
 
 		String endPoint = req.getRequestURI().replaceAll(req.getContextPath(), "");
 		System.out.println("endPoint : " + endPoint);
@@ -99,7 +99,15 @@ public class Dispatcher implements Filter {
 			for(Method method : methods) {
 				if(method.getName().equals(methodKey)) { // 해당 set 메소드 찾기
 					try {
-						method.invoke(instance, request.getParameter(key)); // 실행할 객체와 인자를 전달
+						String param = request.getParameter(key);
+						Parameter[] params = method.getParameters();
+						System.out.println("params[0].getType() : " + params[0].getType());
+						if(params[0].getType() == Integer.class) {
+							System.out.println("parseInt");
+							method.invoke(instance,  Integer.parseInt(param));
+						}else {
+							method.invoke(instance, param); // 실행할 객체와 인자를 전달
+						}
 					} catch (Exception e) {
 						e.printStackTrace();
 					} 

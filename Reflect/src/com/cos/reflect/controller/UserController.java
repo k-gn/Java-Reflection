@@ -3,6 +3,7 @@ package com.cos.reflect.controller;
 import com.cos.reflect.anno.RequestMapping;
 import com.cos.reflect.dto.JoinDto;
 import com.cos.reflect.dto.LoginDto;
+import com.cos.reflect.model.User;
 
 public class UserController {
 
@@ -29,6 +30,13 @@ public class UserController {
 	@RequestMapping("/hello")
 	public String hello() {
 		System.out.println("hello() 함수 호출됨!");
+		return "/";
+	}
+	
+	@RequestMapping("/user/list")
+	public String list(User user) {
+		System.out.println("list() 함수 호출됨!");
+		System.out.println(user);
 		return "/";
 	}
 }
